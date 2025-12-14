@@ -1,0 +1,15 @@
+/Users/tiko/Programming Projects/TScript/bin/Debug/net9.0/TScript
+/Users/tiko/Programming Projects/TScript/bin/Debug/net9.0/TScript.deps.json
+/Users/tiko/Programming Projects/TScript/bin/Debug/net9.0/TScript.runtimeconfig.json
+/Users/tiko/Programming Projects/TScript/bin/Debug/net9.0/TScript.dll
+/Users/tiko/Programming Projects/TScript/bin/Debug/net9.0/TScript.pdb
+/Users/tiko/Programming Projects/TScript/obj/Debug/net9.0/TScript.GeneratedMSBuildEditorConfig.editorconfig
+/Users/tiko/Programming Projects/TScript/obj/Debug/net9.0/TScript.AssemblyInfoInputs.cache
+/Users/tiko/Programming Projects/TScript/obj/Debug/net9.0/TScript.AssemblyInfo.cs
+/Users/tiko/Programming Projects/TScript/obj/Debug/net9.0/TScript.csproj.CoreCompileInputs.cache
+/Users/tiko/Programming Projects/TScript/obj/Debug/net9.0/TScript.sourcelink.json
+/Users/tiko/Programming Projects/TScript/obj/Debug/net9.0/TScript.dll
+/Users/tiko/Programming Projects/TScript/obj/Debug/net9.0/refint/TScript.dll
+/Users/tiko/Programming Projects/TScript/obj/Debug/net9.0/TScript.pdb
+/Users/tiko/Programming Projects/TScript/obj/Debug/net9.0/TScript.genruntimeconfig.cache
+/Users/tiko/Programming Projects/TScript/obj/Debug/net9.0/ref/TScript.dll
