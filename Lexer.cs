@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 
 public class Lexer
 {
@@ -25,51 +26,34 @@ public class Lexer
         while(i < source_line.Length)
         {
             char letter = source_line[i];
-            TypeCode type = letter.GetTypeCode();
-
             string token;
+            int start; // start position of a token
 
-            if(type == TypeCode.String)
+
+            if(char.IsLetter(letter))
             {
-                token = letter.ToString();
-                while(type == TypeCode.String && i < 100)
-                {
-                    letter = source_line[++i];
-                    type = letter.GetTypeCode();
-                    token += letter.ToString();
+                start = i;
+
+                while(i < source_line.Length && char.IsLetter(source_line[i]))
                     i++;
-                }
-                Console.WriteLine("The token is: " + token);
-            }
-            else if (type == TypeCode.Int16 || type == TypeCode.Int32)
-            {
                 
+                token = source_line.Substring(start, i - start);
+                Console.WriteLine("The token is a string: (" + token + ")");
+                continue;
+            }
+            else if(char.IsDigit(letter))
+            {
+                start = i;
+
+                while(i < source_line.Length && (char.IsDigit(source_line[i]) || source_line[i] == '.'))
+                    i++;
+
+                token = source_line.Substring(start, i - start);
+                Console.WriteLine("The token is a number: (" + token + ")");
+                continue;
             }
 
-            Console.WriteLine("type is: " + type);
             i++;
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        // char[] split_points = [' '];
-
-        // string[] chunks = source_line.Split(split_points);
-
-        // foreach(string chunk in chunks)
-        //     Console.WriteLine(chunk);
-
-
-
-        // for(int i = 0; i < source_line.Length; i++)
-        // {
-        //     Console.WriteLine(source_line[i]);
-        // }
     }
 }
