@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TScript")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3ddc47c2fbeb5eac3684dc9b07d9347c3c18fccf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+998a8023c9bee61eb0962f5c2d31693553793ca8")]
 [assembly: System.Reflection.AssemblyProductAttribute("TScript")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TScript")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
