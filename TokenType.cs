@@ -8,6 +8,7 @@ public enum TokenType
     Minus,
     Star,
     Slash,
+    Percent,
     Equals,
     Semicolon,
     LeftParen,

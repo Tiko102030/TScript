@@ -1,8 +1,3 @@
-using System.Diagnostics;
-using System.Linq.Expressions;
-using System.Net.Http.Headers;
-using System.Security.Cryptography.X509Certificates;
-
 public class Lexer
 {
     private readonly string _source;
@@ -13,22 +8,17 @@ public class Lexer
         _source = source;
     }
 
-    public string SplitIntoChunks(string source)
-    {
-        return source;
-    }
-
     public List<Token> Tokenize()
     {
-        string source_line = SplitIntoChunks(_source);
-        Console.WriteLine("Tokenizing: " + source_line + "\n");
+        string source = _source;
+        Console.WriteLine("Tokenizing: " + source + "\n");
 
-        source_line = source_line.Trim();
+        source = source.Trim();
 
         int i = 0;
-        while(i < source_line.Length)
+        while(i < source.Length)
         {
-            char letter = source_line[i];
+            char letter = source[i];
             string token;
             int start; // start position of a token
 
@@ -36,10 +26,10 @@ public class Lexer
             {
                 start = i;
 
-                while(i < source_line.Length && char.IsLetter(source_line[i]))
+                while(i < source.Length && char.IsLetter(source[i]))
                     i++;
                 
-                token = source_line.Substring(start, i - start);
+                token = source.Substring(start, i - start);
 
                 string[] possibleKeywords = ["цел", "функ"];
 
@@ -52,14 +42,11 @@ public class Lexer
                     tokenList.Add(new Token(TokenType.Identifier, token));
                 }
             }
-            else if(char.IsSymbol(letter) || letter == '/' || letter == '*')
+            else if(char.IsSymbol(letter) || letter == '/' || letter == '*' || letter == '%')
             {
                 start = i;
 
-                while(i < source_line.Length && (char.IsSymbol(source_line[i]) || source_line[i] == '/' || source_line[i] == '*'))
-                    i++;
-
-                token = source_line.Substring(start, i - start);
+                token = source.Substring(start, i - start);
 
                 switch(token)
                 {
@@ -83,19 +70,25 @@ public class Lexer
                     tokenList.Add(new Token(TokenType.Star, token));
                     break;
 
+                    case "%":
+                    tokenList.Add(new Token(TokenType.Percent, token));
+                    break;
+
                     default:
-                    Console.WriteLine("\nUNSUPPORTED CHAR: " + token + "\n"); 
+                    Console.WriteLine("\nUNSUPPORTED CHAR: (" + token + ")"); 
                     break; 
                 }
+                
+                i++;
             }
             else if(char.IsDigit(letter))
             {
                 start = i;
 
-                while(i < source_line.Length && (char.IsDigit(source_line[i]) || source_line[i] == '.'))
+                while(i < source.Length && (char.IsDigit(source[i]) || source[i] == '.'))
                     i++;
 
-                token = source_line.Substring(start, i - start);
+                token = source.Substring(start, i - start);
                 tokenList.Add(new Token(TokenType.Number, token));
             }
             else if(letter == ';')
@@ -107,7 +100,6 @@ public class Lexer
             else if(char.IsWhiteSpace(letter))
             {
                 token = letter.ToString();
-                // Console.WriteLine("Token is white space: (" + token + ")");
                 i++;
 
             }
@@ -125,17 +117,17 @@ public class Lexer
             }
             else
             {
-                Console.WriteLine("\nUNSUPPORTED CHAR: " + letter + "\n");  
+                Console.WriteLine("\nUNSUPPORTED CHAR: (" + letter + ")");  
                 i++;              
             }
         }
 
         tokenList.Add(new Token(TokenType.EOF, ""));
         
-        foreach (var token in tokenList)
-        {
-            Console.WriteLine("[{0}, {1}]", token.Type, token.Lexeme); 
-        }
+        // foreach (var token in tokenList)
+        // {
+        //     Console.WriteLine("[{0}, {1}]", token.Type, token.Lexeme); 
+        // }
 
         Console.Write("\n");
 
