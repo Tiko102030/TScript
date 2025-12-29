@@ -1,6 +1,4 @@
-using System.Runtime.InteropServices;
-
-abstract class ASTnode() {}
+abstract class ASTnode {}
 abstract class Statement : ASTnode {}
 abstract class Expression : ASTnode {}
 
@@ -27,6 +25,20 @@ class NumberExpression : Expression
     }
 }
 
+class VarDeclaration : Statement
+{
+    public VarType Type;
+    public string Name;
+    public Expression Declaration;
+
+    public VarDeclaration(VarType type, string name, Expression declaration)
+    {
+        Type = type;
+        Name = name;
+        Declaration = declaration;
+    }
+}
+
 class Parser
 {   
     public int i = 0; // current token ID
@@ -36,21 +48,59 @@ class Parser
     public Parser(List<Token> _tokenList)
     {
         tokenList = _tokenList;
-        foreach (var token in tokenList)
-        {
-            Console.WriteLine("[{0}, {1}]", token.Type, token.Lexeme); 
-        }
     }
 
     Token Consume(TokenType type)
     {
         if(tokenList[i].Type == type)
-        {
-            i++;
-            return tokenList[i];
+        {   
+            return tokenList[i++];
         }
 
-        throw new Exception($"Expected {type}, got {Peek().Type}");
+        throw new Exception($"Expected {type}, got {tokenList[i].Type}");
+    }
+
+    public void ParseProgram()
+    {
+        List<Statement> statements = new List<Statement>();
+
+        while(tokenList[i].Type != TokenType.EOF)
+        {
+            statements.Add(ParseStatement());
+        }
+    }
+
+    Statement ParseStatement()
+    {
+        if(tokenList[i].Type == TokenType.Keyword)
+        {
+            VarType type = GetVarType(tokenList[i].Lexeme);
+            
+            i++;
+            string name;
+            if(tokenList[i].Type == TokenType.Identifier)
+            {
+                name = tokenList[i].Lexeme;
+            }
+            else
+            {
+                throw new Exception("Expected identifier");
+            }
+            
+            i++;
+            if(tokenList[i].Type != TokenType.Equals)
+            {
+                throw new Exception("Expected '=' when declaring variable");
+            }
+
+            i++;
+            Expression declaration = ParseExpression();
+
+            return new VarDeclaration(type, name, declaration);
+        }
+
+
+        throw new Exception("Couldn't parse Expression");
     }
 
     public Expression ParseExpression()
@@ -59,7 +109,7 @@ class Parser
 
         while(tokenList[i].Type == TokenType.Plus || tokenList[i].Type == TokenType.Minus) // + or -
         {
-            Token op = tokenList[--i];
+            Token op = tokenList[i++];
             Expression right = ParseTerm();
             expr = new BinaryExpression(expr, op, right);
         }
@@ -73,8 +123,8 @@ class Parser
 
         while(tokenList[i].Type == TokenType.Star || tokenList[i].Type == TokenType.Slash) // * or /
         {
-            Token op = tokenList[--i];
-            Expression right = ParseExpression();
+            Token op = tokenList[i++];
+            Expression right = ParseFactor();
             expr = new BinaryExpression(expr, op, right);
         }
 
@@ -85,28 +135,32 @@ class Parser
     {
         if(tokenList[i].Type == TokenType.Number)
         {
-            return new NumberExpression(Convert.ToDouble(tokenList[--i].Lexeme));
+            double value = Convert.ToDouble(tokenList[i].Lexeme);
+            i++;
+            return new NumberExpression(value);
         }
 
         if(tokenList[i].Type == TokenType.LeftParen)
         {
+            i++;
             Expression expr = ParseExpression();
             Consume(TokenType.RightParen);
             return expr;
         }
 
-        throw new Exception("Factor couldn't be parsed");
-
+        throw new Exception("Expected expression");
     }
 
-    Token Next()
+    VarType GetVarType(string s)
     {
-        i++;
-        return tokenList[i];
-    }
+        foreach(VarType type in Enum.GetValues(typeof(VarType)))
+        {
+            if(type.ToString().ToLower() == s)
+            {
+                return type;
+            }
+        }
 
-    Token Peek()
-    {
-        return tokenList[i+1];
+        throw new Exception($"{s} is not a valid Variable Type");
     }
 }

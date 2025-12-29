@@ -26,12 +26,12 @@ public class Lexer
             {
                 start = i;
 
-                while(i < source.Length && char.IsLetter(source[i]))
+                while(i < source.Length && char.IsLetterOrDigit(source[i]) || source[i] == '_')
                     i++;
                 
                 token = source.Substring(start, i - start);
 
-                string[] possibleKeywords = ["цел", "функ"];
+                string[] possibleKeywords = ["цел", "функ", "вещественное", "строка", "логическое"];
 
                 if (Array.Exists(possibleKeywords, t => t == token))
                 {
@@ -44,9 +44,7 @@ public class Lexer
             }
             else if(char.IsSymbol(letter) || letter == '/' || letter == '*' || letter == '%')
             {
-                start = i;
-
-                token = source.Substring(start, i - start);
+                token = letter.ToString();
 
                 switch(token)
                 {
@@ -124,10 +122,10 @@ public class Lexer
 
         tokenList.Add(new Token(TokenType.EOF, ""));
         
-        // foreach (var token in tokenList)
-        // {
-        //     Console.WriteLine("[{0}, {1}]", token.Type, token.Lexeme); 
-        // }
+        foreach (var token in tokenList)
+        {
+            Console.WriteLine("[{0}, {1}]", token.Type, token.Lexeme); 
+        }
 
         Console.Write("\n");
 

@@ -2,8 +2,12 @@
 {
     static void Main()
     {
-        var lexer = new Lexer("цел x = (1.55 * 2);");
+        var lexer = new Lexer("(2 * (1.55 + 3.2)) * 2");
         var parser = new Parser(lexer.Tokenize());
-        parser.ParseExpression();
+
+        Expression ast = parser.ParseExpression();
+
+        ASTprinter printer = new ASTprinter();
+        Console.WriteLine(printer.Print(ast));
     }
 }
