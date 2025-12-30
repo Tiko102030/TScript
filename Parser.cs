@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 abstract class ASTnode {}
 abstract class Statement : ASTnode {}
 abstract class Expression : ASTnode {}
@@ -70,37 +72,61 @@ class Parser
         }
     }
 
-    Statement ParseStatement()
+    VarType GetVarType(string s)
     {
-        if(tokenList[i].Type == TokenType.Keyword)
+        foreach(VarType type in Enum.GetValues(typeof(VarType)))
         {
-            VarType type = GetVarType(tokenList[i].Lexeme);
-            
-            i++;
-            string name;
-            if(tokenList[i].Type == TokenType.Identifier)
+            if(type.ToString().ToLower() == s)
             {
-                name = tokenList[i].Lexeme;
+                return type;
             }
-            else
-            {
-                throw new Exception("Expected identifier");
-            }
-            
-            i++;
-            if(tokenList[i].Type != TokenType.Equals)
-            {
-                throw new Exception("Expected '=' when declaring variable");
-            }
-
-            i++;
-            Expression declaration = ParseExpression();
-
-            return new VarDeclaration(type, name, declaration);
         }
 
+        throw new Exception($"{s} is not a valid Variable Type");
+    }
 
-        throw new Exception("Couldn't parse Expression");
+    string GetDeclarationKeywords()
+    {
+        string s = "";
+
+        foreach(VarType type in Enum.GetValues(typeof(VarType)))
+        {
+            s += type.ToString();
+        }
+
+        return s.ToLower();
+    }
+
+    Statement ParseStatement()
+    {
+        Statement statement = null;
+
+        // Checks if the token is a variable type
+        if(GetDeclarationKeywords().Contains(tokenList[i].Lexeme))
+        {
+            VarType type = GetVarType(tokenList[i++].Lexeme);
+
+            string name = Consume(TokenType.Identifier).Lexeme;
+            
+            Consume(TokenType.Equals);
+
+            Expression declaration = ParseExpression();
+            statement = new VarDeclaration(type, name, declaration);
+        }
+        else
+        {
+            throw new Exception("Couldn't parse statement");
+        }
+
+        if(tokenList[i].Type == TokenType.Semicolon)
+        {
+            i++;
+            return statement;
+        }
+        else
+        {
+            throw new Exception("Couldn't parse statement");
+        }
     }
 
     public Expression ParseExpression()
@@ -149,18 +175,5 @@ class Parser
         }
 
         throw new Exception("Expected expression");
-    }
-
-    VarType GetVarType(string s)
-    {
-        foreach(VarType type in Enum.GetValues(typeof(VarType)))
-        {
-            if(type.ToString().ToLower() == s)
-            {
-                return type;
-            }
-        }
-
-        throw new Exception($"{s} is not a valid Variable Type");
     }
 }
