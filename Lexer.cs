@@ -22,6 +22,21 @@ public class Lexer
             string token;
             int start; // start position of a token
 
+            if(letter == '#')
+            {
+                while(letter != '\n' && i < source.Length - 1)
+                {
+                    i++;
+                    letter = source[i];
+                }
+
+                i++;
+                if(i < source.Length)
+                    letter = source[i];
+                else
+                    break;
+            }
+            
             if(char.IsLetter(letter))
             {
                 start = i;

@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 abstract class ASTnode {}
 abstract class Statement : ASTnode {}
 abstract class Expression : ASTnode {}
@@ -62,7 +60,7 @@ class Parser
         throw new Exception($"Expected {type}, got {tokenList[i].Type}");
     }
 
-    public void ParseProgram()
+    public List<Statement> ParseProgram()
     {
         List<Statement> statements = new List<Statement>();
 
@@ -70,6 +68,8 @@ class Parser
         {
             statements.Add(ParseStatement());
         }
+
+        return statements;
     }
 
     VarType GetVarType(string s)
@@ -85,24 +85,12 @@ class Parser
         throw new Exception($"{s} is not a valid Variable Type");
     }
 
-    string GetDeclarationKeywords()
-    {
-        string s = "";
-
-        foreach(VarType type in Enum.GetValues(typeof(VarType)))
-        {
-            s += type.ToString();
-        }
-
-        return s.ToLower();
-    }
-
     Statement ParseStatement()
     {
         Statement statement = null;
 
         // Checks if the token is a variable type
-        if(GetDeclarationKeywords().Contains(tokenList[i].Lexeme))
+        if(Enum.TryParse<VarType>(tokenList[i].Lexeme, ignoreCase: true, out var c))
         {
             VarType type = GetVarType(tokenList[i++].Lexeme);
 
@@ -125,7 +113,7 @@ class Parser
         }
         else
         {
-            throw new Exception("Couldn't parse statement");
+            throw new Exception("Couldn't parse statement, expected semicolon");
         }
     }
 

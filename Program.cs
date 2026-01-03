@@ -1,11 +1,15 @@
-﻿class Program
+﻿using System.IO;
+
+class Program
 {
     static void Main()
     {
-        var lexer = new Lexer("(2 * (1.55 + 3.2)) * 2");
+        string inputFile = File.ReadAllText("main.tscript");
+
+        var lexer = new Lexer(inputFile);
         var parser = new Parser(lexer.Tokenize());
 
-        Expression ast = parser.ParseExpression();
+        List<Statement> ast = parser.ParseProgram();
 
         ASTprinter printer = new ASTprinter();
         Console.WriteLine(printer.Print(ast));
