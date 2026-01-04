@@ -1,3 +1,5 @@
+using System.Reflection.Metadata.Ecma335;
+
 abstract class ASTnode {}
 abstract class Statement : ASTnode {}
 abstract class Expression : ASTnode {}
@@ -36,6 +38,32 @@ class VarDeclaration : Statement
         Type = type;
         Name = name;
         Declaration = declaration;
+    }
+}
+
+class VarAssignment : Statement
+{
+    public string Name;
+    public Expression Assignment;
+
+    public VarAssignment(string name, Expression assignment)
+    {
+        Name = name;
+        Assignment = assignment;
+    }
+}
+
+class FunctionDeclaration : Statement
+{
+    public string Name;
+    public Statement Arguments;
+    public Statement FunctionContents;
+
+    public FunctionDeclaration(string name, Statement arguments, Statement functionContents)
+    {
+        Name = name;
+        Arguments = arguments;
+        FunctionContents = functionContents;
     }
 }
 
@@ -90,7 +118,7 @@ class Parser
         Statement statement = null;
 
         // Checks if the token is a variable type
-        if(Enum.TryParse<VarType>(tokenList[i].Lexeme, ignoreCase: true, out var c))
+        if(Enum.TryParse<VarType>(tokenList[i].Lexeme, ignoreCase: true, out var c)) // Var Declaration
         {
             VarType type = GetVarType(tokenList[i++].Lexeme);
 
@@ -101,6 +129,24 @@ class Parser
             Expression declaration = ParseExpression();
             statement = new VarDeclaration(type, name, declaration);
         }
+        else if(tokenList[i].Type == TokenType.Identifier) // Var Assignment 
+        {
+            string name = Consume(TokenType.Identifier).Lexeme;
+
+            Consume(TokenType.Equals);
+
+            Expression assignment = ParseExpression();
+            statement = new VarAssignment(name, assignment);
+        }
+        // else if(tokenList[i].Lexeme == "функ")
+        // {   
+        //     i++;
+        //     string name = Consume(TokenType.Identifier).Lexeme;
+
+        //     Consume(TokenType.LeftParen);
+        //     // Statement arguments = 
+        //     Consume(TokenType.RightParen);
+        // }
         else
         {
             throw new Exception("Couldn't parse statement");
