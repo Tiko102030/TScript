@@ -1,5 +1,7 @@
 using System.Reflection;
 using System.Text;
+using System.Collections;
+using System.Linq;
 
 class ASTprinter
 {
@@ -9,8 +11,7 @@ class ASTprinter
 
         for (int i = 0; i < statements.Count; i++)
         {
-            bool isLast = i == statements.Count - 1;
-            PrintNode(statements[i], sb, "", isLast);
+            PrintNode(statements[i], sb, "", i == statements.Count - 1);
         }
 
         return sb.ToString();
@@ -18,42 +19,39 @@ class ASTprinter
 
     private void PrintNode(object node, StringBuilder sb, string prefix, bool isLast)
     {
-        if (node == null)
-            return;
+        if (node == null) return;
 
         sb.Append(prefix);
         sb.Append(isLast ? "└── " : "├── ");
         sb.AppendLine(node.GetType().Name);
 
+        string childPrefix = prefix + (isLast ? "    " : "│   ");
+
         var fields = node.GetType()
                          .GetFields(BindingFlags.Public | BindingFlags.Instance);
-
-        string childPrefix = prefix + (isLast ? "    " : "│   ");
 
         for (int i = 0; i < fields.Length; i++)
         {
             var field = fields[i];
-            object value = field.GetValue(node);
+            var value = field.GetValue(node);
+            if (value == null) continue;
 
-            if (value == null)
-                continue;
+            bool fieldIsLast = i == fields.Length - 1;
 
-            bool lastField = i == fields.Length - 1;
-
-            // AST node → recurse
+            // Single AST node
             if (value is ASTnode)
             {
                 sb.Append(childPrefix);
                 sb.AppendLine(field.Name + ":");
-                PrintNode(value, sb, childPrefix, lastField);
+                PrintNode(value, sb, childPrefix, fieldIsLast);
             }
-            // List of AST nodes (future-proof)
-            else if (value is IEnumerable<ASTnode> list)
+            // List (statements, parameters, etc.)
+            else if (value is IEnumerable enumerable && value is not string)
             {
                 sb.Append(childPrefix);
                 sb.AppendLine(field.Name + ":");
 
-                var items = list.ToList();
+                var items = enumerable.Cast<object>().ToList();
                 for (int j = 0; j < items.Count; j++)
                 {
                     PrintNode(items[j], sb, childPrefix, j == items.Count - 1);
@@ -63,7 +61,7 @@ class ASTprinter
             else
             {
                 sb.Append(childPrefix);
-                sb.Append(isLast ? "└── " : "├── ");
+                sb.Append(fieldIsLast ? "└── " : "├── ");
                 sb.AppendLine($"{field.Name}: {value}");
             }
         }

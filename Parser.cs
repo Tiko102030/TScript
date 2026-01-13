@@ -1,8 +1,18 @@
-using System.Reflection.Metadata.Ecma335;
-
 abstract class ASTnode {}
 abstract class Statement : ASTnode {}
 abstract class Expression : ASTnode {}
+
+class FunctionParameter
+{
+    public VarType Type;
+    public string Name;
+
+    public FunctionParameter(VarType type, string name)
+    {
+        Type = type;
+        Name = name;
+    }
+}
 
 class BinaryExpression : Expression
 {
@@ -24,6 +34,16 @@ class NumberExpression : Expression
     public NumberExpression(double value)
     {
         Value = value;
+    }
+}
+
+class VariableExpression : Expression
+{
+    public Token Name;
+
+    public VariableExpression(Token name)
+    {
+        Name = name;
     }
 }
 
@@ -56,13 +76,13 @@ class VarAssignment : Statement
 class FunctionDeclaration : Statement
 {
     public string Name;
-    public Statement Arguments;
-    public Statement FunctionContents;
+    public List<FunctionParameter> Parameters;
+    public List<Statement> FunctionContents;
 
-    public FunctionDeclaration(string name, Statement arguments, Statement functionContents)
+    public FunctionDeclaration(string name, List<FunctionParameter> parameters, List<Statement> functionContents)
     {
         Name = name;
-        Arguments = arguments;
+        Parameters = parameters;
         FunctionContents = functionContents;
     }
 }
@@ -138,15 +158,47 @@ class Parser
             Expression assignment = ParseExpression();
             statement = new VarAssignment(name, assignment);
         }
-        // else if(tokenList[i].Lexeme == "функ")
-        // {   
-        //     i++;
-        //     string name = Consume(TokenType.Identifier).Lexeme;
+        else if(tokenList[i].Lexeme == "функ")
+        {   
+            i++;
+            string name = Consume(TokenType.Identifier).Lexeme;
 
-        //     Consume(TokenType.LeftParen);
-        //     // Statement arguments = 
-        //     Consume(TokenType.RightParen);
-        // }
+            Consume(TokenType.LeftParen);
+
+            List<FunctionParameter> parameters = new List<FunctionParameter>();
+
+            while(tokenList[i].Type == TokenType.Keyword)
+            {
+                VarType type = GetVarType(tokenList[i++].Lexeme);
+
+                string par_name = Consume(TokenType.Identifier).Lexeme;
+
+                parameters.Add(new FunctionParameter(type, par_name));
+
+                if(tokenList[i].Type != TokenType.Comma)
+                    break;
+                else
+                    i++;
+            }
+
+            Consume(TokenType.RightParen);
+
+
+            Consume(TokenType.LeftCurlyParen);
+
+            List<Statement> function_statements = new List<Statement>();
+
+            while(tokenList[i].Type != TokenType.RightCurlyParen)
+            {
+                if(tokenList[i].Type == TokenType.EOF)
+                {
+                    throw new Exception("Missing '}'");
+                }
+                function_statements.Add(ParseStatement());
+            }
+
+            Consume(TokenType.RightCurlyParen);
+        }
         else
         {
             throw new Exception("Couldn't parse statement");
@@ -195,9 +247,14 @@ class Parser
     {
         if(tokenList[i].Type == TokenType.Number)
         {
-            double value = Convert.ToDouble(tokenList[i].Lexeme);
-            i++;
+            double value = Convert.ToDouble(tokenList[i++].Lexeme);
             return new NumberExpression(value);
+        }
+
+        if(tokenList[i].Type == TokenType.Identifier)
+        {
+            Token name = tokenList[i++];
+            return new VariableExpression(name);
         }
 
         if(tokenList[i].Type == TokenType.LeftParen)

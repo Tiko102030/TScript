@@ -13,5 +13,8 @@ public enum TokenType
     Semicolon,
     LeftParen,
     RightParen,
+    LeftCurlyParen,
+    RightCurlyParen,
+    Comma,
     EOF
 }

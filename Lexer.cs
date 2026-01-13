@@ -57,7 +57,7 @@ public class Lexer
                     tokenList.Add(new Token(TokenType.Identifier, token));
                 }
             }
-            else if(char.IsSymbol(letter) || letter == '/' || letter == '*' || letter == '%')
+            else if(char.IsSymbol(letter) || letter == '/' || letter == '*' || letter == '%' || letter == ',')
             {
                 token = letter.ToString();
 
@@ -85,6 +85,10 @@ public class Lexer
 
                     case "%":
                     tokenList.Add(new Token(TokenType.Percent, token));
+                    break;
+
+                    case ",":
+                    tokenList.Add(new Token(TokenType.Comma, token));
                     break;
 
                     default:
@@ -123,6 +127,18 @@ public class Lexer
                 tokenList.Add(new Token(TokenType.LeftParen, token));
             }
             else if(letter == ')')
+            {
+                token = letter.ToString();
+                i++;
+                tokenList.Add(new Token(TokenType.RightParen, token));
+            }
+            else if(letter == '{')
+            {
+                token = letter.ToString();
+                i++;
+                tokenList.Add(new Token(TokenType.RightParen, token));
+            }
+            else if(letter == '}')
             {
                 token = letter.ToString();
                 i++;
