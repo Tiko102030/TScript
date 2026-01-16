@@ -133,6 +133,17 @@ class Parser
         throw new Exception($"{s} is not a valid Variable Type");
     }
 
+    bool Match(TokenType type)
+    {
+        if (tokenList[i].Type == type)
+        {
+            i++;
+            return true;
+        }
+        return false;
+    }
+
+
     Statement ParseStatement()
     {
         Statement statement = null;
@@ -165,20 +176,19 @@ class Parser
 
             Consume(TokenType.LeftParen);
 
-            List<FunctionParameter> parameters = new List<FunctionParameter>();
+            List<FunctionParameter> parameters = new();
 
-            while(tokenList[i].Type == TokenType.Keyword)
+            if (tokenList[i].Type != TokenType.RightParen)
             {
-                VarType type = GetVarType(tokenList[i++].Lexeme);
+                do
+                {
+                    Token typeToken = Consume(TokenType.Keyword);
+                    VarType type = GetVarType(typeToken.Lexeme);
 
-                string par_name = Consume(TokenType.Identifier).Lexeme;
-
-                parameters.Add(new FunctionParameter(type, par_name));
-
-                if(tokenList[i].Type != TokenType.Comma)
-                    break;
-                else
-                    i++;
+                    string par_name = Consume(TokenType.Identifier).Lexeme;
+                    parameters.Add(new FunctionParameter(type, par_name));
+                }
+                while (Match(TokenType.Comma));
             }
 
             Consume(TokenType.RightParen);
@@ -198,11 +208,17 @@ class Parser
             }
 
             Consume(TokenType.RightCurlyParen);
+
+            statement = new FunctionDeclaration(name, parameters, function_statements);
         }
         else
         {
             throw new Exception("Couldn't parse statement");
         }
+
+        if (statement is FunctionDeclaration)
+            return statement;
+
 
         if(tokenList[i].Type == TokenType.Semicolon)
         {

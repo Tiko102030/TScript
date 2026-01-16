@@ -136,13 +136,13 @@ public class Lexer
             {
                 token = letter.ToString();
                 i++;
-                tokenList.Add(new Token(TokenType.RightParen, token));
+                tokenList.Add(new Token(TokenType.LeftCurlyParen, token));
             }
             else if(letter == '}')
             {
                 token = letter.ToString();
                 i++;
-                tokenList.Add(new Token(TokenType.RightParen, token));
+                tokenList.Add(new Token(TokenType.RightCurlyParen, token));
             }
             else
             {
