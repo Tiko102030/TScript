@@ -1,6 +1,8 @@
-abstract class ASTnode {}
-abstract class Statement : ASTnode {}
-abstract class Expression : ASTnode {}
+abstract class ASTnode { }
+
+abstract class Statement : ASTnode { }
+
+abstract class Expression : ASTnode { }
 
 class FunctionParameter
 {
@@ -16,7 +18,8 @@ class FunctionParameter
 
 class BinaryExpression : Expression
 {
-    public Expression Left, Right;
+    public Expression Left,
+        Right;
     public Token Op;
 
     public BinaryExpression(Expression left, Token op, Expression right)
@@ -32,6 +35,16 @@ class NumberExpression : Expression
     public double Value;
 
     public NumberExpression(double value)
+    {
+        Value = value;
+    }
+}
+
+class StringExpression : Expression
+{
+    public string Value;
+
+    public StringExpression(string value)
     {
         Value = value;
     }
@@ -79,7 +92,11 @@ class FunctionDeclaration : Statement
     public List<FunctionParameter> Parameters;
     public List<Statement> FunctionContents;
 
-    public FunctionDeclaration(string name, List<FunctionParameter> parameters, List<Statement> functionContents)
+    public FunctionDeclaration(
+        string name,
+        List<FunctionParameter> parameters,
+        List<Statement> functionContents
+    )
     {
         Name = name;
         Parameters = parameters;
@@ -88,7 +105,7 @@ class FunctionDeclaration : Statement
 }
 
 class Parser
-{   
+{
     public int i = 0; // current token ID
 
     private readonly List<Token> tokenList;
@@ -100,8 +117,8 @@ class Parser
 
     Token Consume(TokenType type)
     {
-        if(tokenList[i].Type == type)
-        {   
+        if (tokenList[i].Type == type)
+        {
             return tokenList[i++];
         }
 
@@ -112,7 +129,7 @@ class Parser
     {
         List<Statement> statements = new List<Statement>();
 
-        while(tokenList[i].Type != TokenType.EOF)
+        while (tokenList[i].Type != TokenType.EOF)
         {
             statements.Add(ParseStatement());
         }
@@ -122,9 +139,9 @@ class Parser
 
     VarType GetVarType(string s)
     {
-        foreach(VarType type in Enum.GetValues(typeof(VarType)))
+        foreach (VarType type in Enum.GetValues(typeof(VarType)))
         {
-            if(type.ToString().ToLower() == s)
+            if (type.ToString().ToLower() == s)
             {
                 return type;
             }
@@ -143,24 +160,24 @@ class Parser
         return false;
     }
 
-
     Statement ParseStatement()
     {
-        Statement statement = null;
+        // Statement statement = null;
+        Statement statement;
 
         // Checks if the token is a variable type
-        if(Enum.TryParse<VarType>(tokenList[i].Lexeme, ignoreCase: true, out var c)) // Var Declaration
+        if (Enum.TryParse<VarType>(tokenList[i].Lexeme, ignoreCase: true, out var c)) // Var Declaration
         {
             VarType type = GetVarType(tokenList[i++].Lexeme);
 
             string name = Consume(TokenType.Identifier).Lexeme;
-            
+
             Consume(TokenType.Equals);
 
             Expression declaration = ParseExpression();
             statement = new VarDeclaration(type, name, declaration);
         }
-        else if(tokenList[i].Type == TokenType.Identifier) // Var Assignment 
+        else if (tokenList[i].Type == TokenType.Identifier) // Var Assignment
         {
             string name = Consume(TokenType.Identifier).Lexeme;
 
@@ -169,8 +186,8 @@ class Parser
             Expression assignment = ParseExpression();
             statement = new VarAssignment(name, assignment);
         }
-        else if(tokenList[i].Lexeme == "функ")
-        {   
+        else if (tokenList[i].Lexeme == "функ")
+        {
             i++;
             string name = Consume(TokenType.Identifier).Lexeme;
 
@@ -187,20 +204,18 @@ class Parser
 
                     string par_name = Consume(TokenType.Identifier).Lexeme;
                     parameters.Add(new FunctionParameter(type, par_name));
-                }
-                while (Match(TokenType.Comma));
+                } while (Match(TokenType.Comma));
             }
 
             Consume(TokenType.RightParen);
-
 
             Consume(TokenType.LeftCurlyParen);
 
             List<Statement> function_statements = new List<Statement>();
 
-            while(tokenList[i].Type != TokenType.RightCurlyParen)
+            while (tokenList[i].Type != TokenType.RightCurlyParen)
             {
-                if(tokenList[i].Type == TokenType.EOF)
+                if (tokenList[i].Type == TokenType.EOF)
                 {
                     throw new Exception("Missing '}'");
                 }
@@ -219,8 +234,7 @@ class Parser
         if (statement is FunctionDeclaration)
             return statement;
 
-
-        if(tokenList[i].Type == TokenType.Semicolon)
+        if (tokenList[i].Type == TokenType.Semicolon)
         {
             i++;
             return statement;
@@ -235,7 +249,7 @@ class Parser
     {
         Expression expr = ParseTerm();
 
-        while(tokenList[i].Type == TokenType.Plus || tokenList[i].Type == TokenType.Minus) // + or -
+        while (tokenList[i].Type == TokenType.Plus || tokenList[i].Type == TokenType.Minus) // + or -
         {
             Token op = tokenList[i++];
             Expression right = ParseTerm();
@@ -249,7 +263,7 @@ class Parser
     {
         Expression expr = ParseFactor();
 
-        while(tokenList[i].Type == TokenType.Star || tokenList[i].Type == TokenType.Slash) // * or /
+        while (tokenList[i].Type == TokenType.Star || tokenList[i].Type == TokenType.Slash) // * or /
         {
             Token op = tokenList[i++];
             Expression right = ParseFactor();
@@ -261,19 +275,19 @@ class Parser
 
     Expression ParseFactor()
     {
-        if(tokenList[i].Type == TokenType.Number)
+        if (tokenList[i].Type == TokenType.Number)
         {
             double value = Convert.ToDouble(tokenList[i++].Lexeme);
             return new NumberExpression(value);
         }
 
-        if(tokenList[i].Type == TokenType.Identifier)
+        if (tokenList[i].Type == TokenType.Identifier)
         {
             Token name = tokenList[i++];
             return new VariableExpression(name);
         }
 
-        if(tokenList[i].Type == TokenType.LeftParen)
+        if (tokenList[i].Type == TokenType.LeftParen)
         {
             i++;
             Expression expr = ParseExpression();
@@ -281,6 +295,13 @@ class Parser
             return expr;
         }
 
+        if (tokenList[i].Type == TokenType.String)
+        {
+            string value = tokenList[i++].Lexeme;
+            return new StringExpression(value);
+        }
+
         throw new Exception("Expected expression");
     }
 }
+

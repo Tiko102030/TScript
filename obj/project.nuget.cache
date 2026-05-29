@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "LrvSLUaI+Ac=",
+  "dgSpecHash": "ju8vz5gPkHM=",
   "success": true,
   "projectFilePath": "/Users/tiko/Programming Projects/TScript/TScript.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/tiko/.nuget/packages/microsoft.netcore.app.ref/9.0.16/microsoft.netcore.app.ref.9.0.16.nupkg.sha512",
+    "/Users/tiko/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.16/microsoft.aspnetcore.app.ref.9.0.16.nupkg.sha512",
+    "/Users/tiko/.nuget/packages/microsoft.netcore.app.host.osx-arm64/9.0.16/microsoft.netcore.app.host.osx-arm64.9.0.16.nupkg.sha512"
+  ],
   "logs": []
 }

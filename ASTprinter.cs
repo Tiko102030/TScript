@@ -1,7 +1,7 @@
-using System.Reflection;
-using System.Text;
 using System.Collections;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 
 class ASTprinter
 {
@@ -19,7 +19,8 @@ class ASTprinter
 
     private void PrintNode(object node, StringBuilder sb, string prefix, bool isLast)
     {
-        if (node == null) return;
+        if (node == null)
+            return;
 
         sb.Append(prefix);
         sb.Append(isLast ? "└── " : "├── ");
@@ -27,14 +28,14 @@ class ASTprinter
 
         string childPrefix = prefix + (isLast ? "    " : "│   ");
 
-        var fields = node.GetType()
-                         .GetFields(BindingFlags.Public | BindingFlags.Instance);
+        var fields = node.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 
         for (int i = 0; i < fields.Length; i++)
         {
             var field = fields[i];
             var value = field.GetValue(node);
-            if (value == null) continue;
+            if (value == null)
+                continue;
 
             bool fieldIsLast = i == fields.Length - 1;
 

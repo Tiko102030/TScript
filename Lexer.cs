@@ -16,34 +16,34 @@ public class Lexer
         source = source.Trim();
 
         int i = 0;
-        while(i < source.Length)
+        while (i < source.Length)
         {
             char letter = source[i];
             string token;
             int start; // start position of a token
 
-            if(letter == '#')
+            if (letter == '#')
             {
-                while(letter != '\n' && i < source.Length - 1)
+                while (letter != '\n' && i < source.Length - 1)
                 {
                     i++;
                     letter = source[i];
                 }
 
                 i++;
-                if(i < source.Length)
+                if (i < source.Length)
                     letter = source[i];
                 else
                     break;
             }
-            
-            if(char.IsLetter(letter))
+
+            if (char.IsLetter(letter))
             {
                 start = i;
 
-                while(i < source.Length && char.IsLetterOrDigit(source[i]) || source[i] == '_')
+                while (i < source.Length && char.IsLetterOrDigit(source[i]) || source[i] == '_')
                     i++;
-                
+
                 token = source.Substring(start, i - start);
 
                 string[] possibleKeywords = ["цел", "вещественное", "строка", "логическое", "функ"];
@@ -57,88 +57,107 @@ public class Lexer
                     tokenList.Add(new Token(TokenType.Identifier, token));
                 }
             }
-            else if(char.IsSymbol(letter) || letter == '/' || letter == '*' || letter == '%' || letter == ',')
+            else if (letter == '"')
+            {
+                i++;
+                start = i;
+
+                while (i < source.Length && source[i] != '"')
+                    i++;
+
+                token = source.Substring(start, i - start);
+
+                tokenList.Add(new Token(TokenType.String, token));
+
+                i++;
+            }
+            else if (
+                char.IsSymbol(letter)
+                || letter == '/'
+                || letter == '*'
+                || letter == '%'
+                || letter == ','
+            )
             {
                 token = letter.ToString();
 
-                switch(token)
+                switch (token)
                 {
                     case "+":
-                    tokenList.Add(new Token(TokenType.Plus, token));
-                    break;
+                        tokenList.Add(new Token(TokenType.Plus, token));
+                        break;
 
                     case "-":
-                    tokenList.Add(new Token(TokenType.Minus, token));
-                    break;
+                        tokenList.Add(new Token(TokenType.Minus, token));
+                        break;
 
                     case "=":
-                    tokenList.Add(new Token(TokenType.Equals, token));
-                    break;
+                        tokenList.Add(new Token(TokenType.Equals, token));
+                        break;
 
                     case "/":
-                    tokenList.Add(new Token(TokenType.Slash, token));
-                    break;
+                        tokenList.Add(new Token(TokenType.Slash, token));
+                        break;
 
                     case "*":
-                    tokenList.Add(new Token(TokenType.Star, token));
-                    break;
+                        tokenList.Add(new Token(TokenType.Star, token));
+                        break;
 
                     case "%":
-                    tokenList.Add(new Token(TokenType.Percent, token));
-                    break;
+                        tokenList.Add(new Token(TokenType.Percent, token));
+                        break;
 
                     case ",":
-                    tokenList.Add(new Token(TokenType.Comma, token));
-                    break;
+                        tokenList.Add(new Token(TokenType.Comma, token));
+                        break;
 
                     default:
-                    Console.WriteLine("\nUNSUPPORTED CHAR: (" + token + ")"); 
-                    break; 
+                        Console.WriteLine("\nUNSUPPORTED CHAR: (" + token + ")");
+                        break;
                 }
-                
+
                 i++;
             }
-            else if(char.IsDigit(letter))
+            else if (char.IsDigit(letter))
             {
                 start = i;
 
-                while(i < source.Length && (char.IsDigit(source[i]) || source[i] == '.'))
+                while (i < source.Length && (char.IsDigit(source[i]) || source[i] == '.'))
                     i++;
 
                 token = source.Substring(start, i - start);
                 tokenList.Add(new Token(TokenType.Number, token));
             }
-            else if(letter == ';')
+            else if (letter == ';')
             {
                 token = letter.ToString();
                 i++;
                 tokenList.Add(new Token(TokenType.Semicolon, token));
             }
-            else if(char.IsWhiteSpace(letter))
+            else if (char.IsWhiteSpace(letter))
             {
                 token = letter.ToString();
                 i++;
-
             }
-            else if(letter == '(')
+            else if (letter == '(')
             {
                 token = letter.ToString();
                 i++;
                 tokenList.Add(new Token(TokenType.LeftParen, token));
             }
-            else if(letter == ')')
+            else if (letter == ')')
             {
                 token = letter.ToString();
                 i++;
                 tokenList.Add(new Token(TokenType.RightParen, token));
             }
-            else if(letter == '{')
+            else if (letter == '{')
             {
                 token = letter.ToString();
                 i++;
                 tokenList.Add(new Token(TokenType.LeftCurlyParen, token));
             }
-            else if(letter == '}')
+            else if (letter == '}')
             {
                 token = letter.ToString();
                 i++;
@@ -146,16 +165,16 @@ public class Lexer
             }
             else
             {
-                Console.WriteLine("\nUNSUPPORTED CHAR: (" + letter + ")");  
-                i++;              
+                Console.WriteLine("\nUNSUPPORTED CHAR: (" + letter + ")");
+                i++;
             }
         }
 
         tokenList.Add(new Token(TokenType.EOF, ""));
-        
+
         foreach (var token in tokenList)
         {
-            Console.WriteLine("[{0}, {1}]", token.Type, token.Lexeme); 
+            Console.WriteLine("[{0}, {1}]", token.Type, token.Lexeme);
         }
 
         Console.Write("\n");
@@ -163,3 +182,4 @@ public class Lexer
         return tokenList;
     }
 }
+
